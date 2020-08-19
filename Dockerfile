@@ -1,4 +1,6 @@
 FROM alpine
-COPY main /app/
+ARG main
+ENV MAIN ${main}
+COPY ${main} /app/
 WORKDIR /app
-CMD ["./main"]
+ENTRYPOINT ./${MAIN}

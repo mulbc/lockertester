@@ -3,7 +3,7 @@
 builds:
   - id: writer
     dir: writer
-    binary: main
+    binary: writer
     env:
       - CGO_ENABLED=0
     goarch:
@@ -12,7 +12,7 @@ builds:
       - linux
   - id: reader
     dir: reader
-    binary: main
+    binary: reader
     env:
       - CGO_ENABLED=0
     goarch:
@@ -21,35 +21,42 @@ builds:
       - linux
 dockers:
   - builds:
-      - reader
-    binaries:
-      - main
-    dockerfile: Dockerfile
-    image_templates:
-      - "quay.io/mulbc/lockertester:reader"
-      - "quay.io/mulbc/lockertester:reader-{{ .Tag }}"
-    build_flag_templates:
-    - "--pull"
-    - "--label=org.opencontainers.image.created={{.Date}}"
-    - "--label=org.opencontainers.image.title={{.ProjectName}}"
-    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-    - "--label=org.opencontainers.image.version={{.Version}}"
-  - builds:
       - writer
     binaries:
-      - main
+      - writer
     dockerfile: Dockerfile
     image_templates:
       - "quay.io/mulbc/lockertester:writer"
       - "quay.io/mulbc/lockertester:writer-{{ .Tag }}"
     build_flag_templates:
     - "--pull"
+    - "--build-arg=main=writer"
+    - "--label=org.opencontainers.image.created={{.Date}}"
+    - "--label=org.opencontainers.image.title={{.ProjectName}}"
+    - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+    - "--label=org.opencontainers.image.version={{.Version}}"
+  - builds:
+      - reader
+    binaries:
+      - reader
+    dockerfile: Dockerfile
+    image_templates:
+      - "quay.io/mulbc/lockertester:reader"
+      - "quay.io/mulbc/lockertester:reader-{{ .Tag }}"
+    build_flag_templates:
+    - "--pull"
+    - "--build-arg=main=reader"
     - "--label=org.opencontainers.image.created={{.Date}}"
     - "--label=org.opencontainers.image.title={{.ProjectName}}"
     - "--label=org.opencontainers.image.revision={{.FullCommit}}"
     - "--label=org.opencontainers.image.version={{.Version}}"
 archives:
-- format: binary
+- id: reader
+  # name_template: "reader_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  format: binary
+- id: writer
+  # name_template: "writer_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  format: binary
 checksum:
   name_template: 'checksums.txt'
 snapshot:
