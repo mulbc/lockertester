@@ -35,7 +35,6 @@ func main() {
 		fileMutex.Unlock()
 		if err != nil {
 			log.WithError(err).Error("Error when writing to file")
-			continue
 		}
 		n := rand.Intn(10) // n will be between 0 and 10
 		log.WithField("seconds", n).Info("Sleeping")

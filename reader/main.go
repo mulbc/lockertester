@@ -28,14 +28,13 @@ func main() {
 		content, err := ioutil.ReadFile(*path)
 		if err != nil {
 			log.WithError(err).Error("Error when writing to file")
-			fileMutex.Unlock()
-			continue
-		}
-		err = checkForInconsistencies(content)
-		if err != nil {
-			os.Exit(1)
 		} else {
-			log.Info("no inconsistencies yet")
+			err = checkForInconsistencies(content)
+			if err != nil {
+				os.Exit(1)
+			} else {
+				log.Info("no inconsistencies yet")
+			}
 		}
 		fileMutex.Unlock()
 		n := rand.Intn(10) // n will be between 0 and 10
