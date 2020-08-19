@@ -5,7 +5,8 @@ import (
 	"flag"
 	"io/ioutil"
 	"math/rand"
-	"os"
+	"path"
+	"path/filepath"
 	"time"
 
 	"github.com/juju/fslock"
@@ -16,6 +17,11 @@ func main() {
 	path := flag.String("path", "test.file", "path to the test file")
 
 	flag.Parse()
+
+	dir, err := filepath.Abs(filepath.Dir(path))
+	if err != nil {
+		log.WithError(err).Fatal("Could not figure out the dir of the supplied path")
+	}
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -29,9 +35,9 @@ func main() {
 		if err != nil {
 			log.WithError(err).Error("Error when writing to file")
 		} else {
-			err = checkForInconsistencies(content)
+			err = checkForInconsistencies(content, dir)
 			if err != nil {
-				os.Exit(1)
+				time.sleep(time.Day)
 			} else {
 				log.Info("no inconsistencies yet")
 			}
@@ -44,7 +50,7 @@ func main() {
 	}
 }
 
-func checkForInconsistencies(content []byte) error {
+func checkForInconsistencies(content []byte, dir string) error {
 	var compareChar byte
 	for pos, char := range content {
 		if compareChar == 0 {
@@ -58,7 +64,7 @@ func checkForInconsistencies(content []byte) error {
 				WithField("compareChar", string(compareChar)).
 				WithField("position", pos).
 				Error("Char is not CompareChar!!!")
-			ioutil.WriteFile("inconsistent.file", content, 0777)
+			ioutil.WriteFile(path.Join(dir, "inconsistent.file"), content, 0777)
 
 			return errors.New("inconsistency detected")
 		}
