@@ -18,7 +18,7 @@ func main() {
 
 	flag.Parse()
 
-	dir, err := filepath.Abs(filepath.Dir(path))
+	dir, err := filepath.Abs(filepath.Dir(*path))
 	if err != nil {
 		log.WithError(err).Fatal("Could not figure out the dir of the supplied path")
 	}
@@ -37,7 +37,7 @@ func main() {
 		} else {
 			err = checkForInconsistencies(content, dir)
 			if err != nil {
-				time.sleep(time.Day)
+				time.Sleep(time.Hour * 24)
 			} else {
 				log.Info("no inconsistencies yet")
 			}

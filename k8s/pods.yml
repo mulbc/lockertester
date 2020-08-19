@@ -1,0 +1,57 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: writer
+spec:
+  selector:
+    matchLabels:
+      app: lockertester
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: lockertester
+        duty: writer
+    spec:
+      volumes:
+        - name: vol
+          persistentVolumeClaim:
+            claimName: lockertester
+      containers:
+        - name: writer
+          image: quay.io/mulbc/lockertester:writer
+          command: ["./writer"]
+          args:
+            - "-path=/mnt/test.file"
+            - "-size=99999"
+            # Use the last character of the Pod name
+            - "-char=${MY_POD_NAME: -1}"
+          env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: vol
+              mountPath: /mnt
+apiVersion: v1
+kind: Pod
+metadata:
+  name: reader
+  labels:
+    app: lockertester
+    duty: reader
+spec:
+  volumes:
+    - name: vol
+      persistentVolumeClaim:
+        claimName: lockertester
+  containers:
+    - name: reader
+      image: quay.io/mulbc/lockertester:reader
+      command: ["./reader"]
+      args:
+        - "-path=/mnt/test.file"
+      volumeMounts:
+        - name: vol
+          mountPath: /mnt
