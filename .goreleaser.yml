@@ -61,7 +61,7 @@ changelog:
       - '^docs:'
       - '^test:'
 release:
-  ids: []
+  disable: true
 env_files:
   # Comment to enable target token
   # github_token: ~/.path/to/my/gh_token
